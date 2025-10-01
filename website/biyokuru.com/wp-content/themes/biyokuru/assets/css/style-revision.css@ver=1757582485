@@ -1,0 +1,504 @@
+@charset "UTF-8";
+
+.l-header-pc .l-header-pc__inner .l-header-pc__left .l-header-pc__menu .l-header-pc__menu-item.has-submenu .submenu {
+  left: 130%;
+}
+
+@media screen and (max-width: 767px) {
+  .price .price__container .price__inner .price__section .price__list .price__list-item .price__content .price__text .price__text--row.--row2 {
+    flex-direction: column;
+    align-items: start;
+    gap: 10px;
+  }
+
+  .price .price__container .price__inner .price__section .price__list .price__list-item .price__content .price__text .price__text--price {
+    margin-left: auto;
+  }
+}
+
+.price .price__container .price__inner .price__section .price__section__title ,
+.price .price__container .price__inner .price__section .price__list .price__list-item .price__summary-item ,
+.ordermade .price__section .ordermade__inner .price__list .price__list-item .price__summary-item {
+  font-family: "Shippori Mincho", serif;
+}
+
+.price__list-wrap {
+  margin-top: 60px;
+}
+
+.price__list-title {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  font-family: "Shippori Mincho", serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  padding: 18px 30px;
+  background-color: #926f4f;
+}
+
+@media screen and (max-width: 767px) {
+  .price__list-title {
+    min-height: 56px;
+    justify-content: center;
+    padding: 10px 20px;
+  }
+}
+
+.price__list-title .price__list-title-text {
+  font-family: "Zen Kaku Gothic New", sans-serif;
+  max-width: 970px;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.3;
+  margin-top: 10px;
+}
+
+@media screen and (max-width: 767px) {
+  .price__list-title .price__list-title-text {
+    font-size: 14px;
+    margin-top: 8px;
+  }
+}
+
+
+.price__content-set-wrap {
+  overflow: hidden;
+}
+
+.price__content-set {
+  padding-block: 18px;
+  padding-inline: 50px;
+}
+
+@media screen and (max-width: 767px) {
+  .price__content-set {
+    padding-inline: 30px 20px;
+  }
+}
+
+.price__content-set-title {
+  font-size: 18px;
+  letter-spacing: 0.02em;
+}
+
+@media screen and (max-width: 767px) {
+  .price__content-set-title {
+    font-size: 16px;
+  }
+}
+
+.price__content-set-lists {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding-left: 18px;
+}
+
+@media screen and (max-width: 767px) {
+  .price__content-set-lists {
+    padding-left: 0;
+  }
+}
+
+.price__content-set-list {
+  font-size: 16px;
+  letter-spacing: 0.02em;
+}
+
+@media screen and (max-width: 767px) {
+ .price__content-set-list {
+   font-size: 14px;
+ }
+}
+
+.price__list-title .is-nowrap {
+  white-space: nowrap;
+}
+
+/* カテゴリ追加に伴う位置調整 */
+.price .price__container .price__inner .price__section .price__list-wrap .price__list .price__list-item .price__summary-item ,
+.ordermade .price__section .ordermade__inner .price__list .price__list-item .price__summary-item {
+  padding-left: 40px;
+  padding-block: 12px;
+  line-height: 1.2;
+}
+@media screen and (max-width: 767px) {
+  .price .price__container .price__inner .price__section .price__list-wrap .price__list .price__list-item .price__summary-item ,
+  .ordermade .price__section .ordermade__inner .price__list .price__list-item .price__summary-item {
+    padding-left: 25px;
+  }
+}
+.price .price__container .price__inner .price__section .price__list-wrap .price__list .price__list-item .price__text .price__text--row ,
+.price .price__container .price__inner .price__section .price__list .price__list-item .price__text.--drugs p {
+  padding-inline: 50px;
+}
+@media screen and (max-width: 767px) {
+  .price .price__container .price__inner .price__section .price__list-wrap .price__list .price__list-item .price__text .price__text--row ,
+  .price .price__container .price__inner .price__section .price__list .price__list-item .price__text.--drugs p {
+    padding-inline: 30px 20px;
+  }
+}
+.ordermade .price__section .ordermade__inner .price__list .price__list-item .price__text p:nth-child(1) {
+  padding-left: 50px;
+}
+@media screen and (max-width: 767px) {
+  .ordermade .price__section .ordermade__inner .price__list .price__list-item .price__text p:nth-child(1) {
+    padding-left: 30px;
+  }
+}
+
+.price .price__container .price__inner .price__section .price__list .price__list-item .price__summary-item span,
+.ordermade .price__section .ordermade__inner .price__list .price__list-item .price__summary-item span {
+  display: inline-block;
+}
+
+.price__summary-item .is-nowrap {
+  white-space: nowrap;
+}
+
+.faq {
+  margin-top: 120px;
+}
+
+@media screen and (max-width: 767px) {
+  .faq {
+    margin-top: 80px;
+  }
+}
+
+.ordermade__target_txt span {
+  white-space: nowrap;
+}
+
+.ordermade .ordermade__target {
+  background-image: url(../images/menu-single/ordermade-bg-pc.webp);
+}
+
+@media screen and (max-width: 767px) {
+  .ordermade .ordermade__target {
+    background-image: url(../images/menu-single/ordermade-bg-sp.webp);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .ordermade .price__text-unit {
+    flex-wrap: wrap; 
+  }
+
+  .ordermade .price__section .ordermade__inner .price__list .price__list-item .price__text-unit p {
+    line-height: 1.2;
+    text-align: left;
+  }
+
+  .ordermade .price__text-unit span {
+    white-space: nowrap;
+  }
+
+  .ordermade .price__text-unit p:nth-child(2) {
+    margin-left: auto;
+  }
+
+  .ordermade .price__section .ordermade__inner .price__list .price__list-item .price__text .price__text--row {
+    flex-wrap: wrap;
+    line-height: 1.2;
+  }
+
+  .price__text--price {
+    margin-left: auto;
+  }
+}
+
+.ordermade .price__section .ordermade__inner .price__list .price__list-item .price__text p {
+  font-size: 16px;
+}
+
+@media screen and (max-width: 767px) {
+  .ordermade .price__section .ordermade__inner .price__list .price__list-item .price__text p {
+    font-size: 14px;
+  }
+}
+
+.ordermade .price__section .ordermade__inner .price__list .price__list-item .price__text p:nth-child(1) {
+  font-size: 16px; 
+}
+
+@media screen and (max-width: 767px) {
+  .ordermade .price__section .ordermade__inner .price__list .price__list-item .price__text p:nth-child(1) {
+    font-size: 14px;
+  }
+}
+
+/* 代表名画像化 */
+.company .company__container .company__inner .company__table .company__content-item .company__content-text ,
+.commercial-disclosure .cd__inner .cd__content .cd__content-item .cd__content-text {
+  display: flex;
+  align-items: center;
+}
+
+.company .company__container .company__inner .company__table .company__content-item .company__content-text img ,
+.commercial-disclosure .cd__inner .cd__content .cd__content-item .cd__content-text img {
+  width: 143px;
+}
+@media screen and (max-width: 767px) {
+  .company .company__container .company__inner .company__table .company__content-item .company__content-text img ,
+  .commercial-disclosure .cd__inner .cd__content .cd__content-item .cd__content-text img {
+    width: 132px;
+  }
+}
+
+
+.company .company__container .company__inner .company__greeting .company__greeting-title-wrapper .company__greet-title {
+  height: 43px;
+  position: relative;
+}
+
+.company .company__container .company__inner .company__greeting .company__greeting-title-wrapper .company__greet-title img {
+  width: 124px;
+  top: 24%;
+}
+@media screen and (max-width: 767px) {
+  .company .company__container .company__inner .company__greeting .company__greeting-title-wrapper .company__greet-title img {
+    width: 105px;
+  }
+}
+
+.company .company__container .company__inner .company__greeting .company__greeting-text img {
+  vertical-align: text-top;
+  width: 49px;
+  aspect-ratio: 49 / 24;
+  padding-top: 1px;
+} 
+
+@media screen and (max-width: 767px) {
+  .company .company__container .company__inner .company__greeting .company__greeting-text img {
+    width: 41px;
+  } 
+}
+
+.company__content-text ,
+.company__greeting-text ,
+.cd__content-text ,
+.cd__content-list {
+  font-family: "Noto Sans JP", sans-serif;
+}
+
+/* reCAPTCHA */
+.grecaptcha-badge { 
+  visibility: hidden;
+}
+
+.contact__recaptcha {
+  text-align: center;
+}
+
+.contact__recaptcha a {
+  color: #0075c2;
+}
+
+/* 会員用料金一覧ページ */
+.price__text.--members p {
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  gap: 20px;
+  padding: 0px 30px 18px !important;
+  
+}    
+
+@media screen and (max-width: 767px) {
+  .price__text.--members p {
+    padding: 0px 20px 16px !important;
+  }
+}
+
+.price__text--row.--members {
+  display: flex;
+  align-items: center;
+  justify-content: right !important;
+  gap: 20px;
+  font-size: 16px;
+  padding-top: 0 !important;
+}
+
+.price__text--row.--members.--drug {
+  padding: 0px 50px 18px !important;
+}
+
+@media screen and (max-width: 767px) {
+  .price__text--row.--members.--drug {
+    padding: 0px 20px 14px 30px !important;
+  }
+
+  .price__text--row.--members span {
+    margin: unset !important;
+  }
+}
+
+
+/* オーダーメイドページ 使用薬剤・機材  */
+.ordermade__tools-main {
+  display: flex;
+  flex-direction: column;
+  gap: 150px;
+  margin-top: 60px;
+}
+
+.ordermade__tools-item-title-wrap {
+  color: #926f4f;
+  font-family: "Shippori Mincho", serif;
+  padding-block: 16px;
+  border-top: 1px #926f4f solid;
+  border-bottom: 1px #926f4f solid;
+}
+
+.ordermade__tools-item-title {
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+@media screen and (max-width: 1023px) {
+  .ordermade__tools-item-title {
+    font-size: 24px;
+  }
+}
+
+.ordermade__tools-item-title span {
+  white-space: nowrap;
+}
+
+.ordermade__tools-item-text {
+  font-size: 20px;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  margin-top: 8px;
+  padding-inline: 20px;
+}
+
+@media screen and (max-width: 767px) {
+  .ordermade__tools-item-text {
+    font-size: 16px;
+    padding-inline: 10px;
+  }
+}
+
+.ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item {
+  margin: unset;
+  margin-top: 80px;
+  min-height: 300px;
+}
+
+.ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item:nth-child(2) {
+  margin-top: 60px;
+}
+
+@media screen and (max-width: 767px) {
+  .ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item:nth-child(2) {
+    margin-top: 40px;
+  }
+}
+
+
+@media screen and (max-width: 767px) {
+  .ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item {
+    margin-top: 100px;
+  }
+}
+
+.ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item.--reverse > *:first-child {
+  order: 1;
+}
+
+.ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item img {
+  width: 100%;
+  height: 100%;
+  max-height: 350px;
+  object-fit: contain;
+}
+
+@media screen and (max-width: 767px) {
+  .ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item img {
+    min-height: 200px;
+    max-height: 300px;
+  }
+}
+
+
+.ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item-txt-wrapper .ordermade__tools_item-txt {
+  font-size: 16px;
+}
+
+@media screen and (max-width: 767px) {
+  .ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item-txt-wrapper .ordermade__tools_item-txt {
+    font-size: 14px;
+  }
+}
+
+.ordermade__tools-item-img--scale {
+  scale: 0.8;
+}
+
+.ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item-txt-wrapper .ordermade__tools_item-heading {
+  line-height: 1.3;
+}
+
+@media screen and (max-width: 768px) {
+  .ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item-txt-wrapper .ordermade__tools_item-heading {
+    font-size: 20px;
+  }
+}
+
+.ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item-txt-wrapper .ordermade__tools_item-heading span {
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 767px) {
+  .ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools_item-txt-wrapper {
+    margin-top: 12px;
+  }
+}
+
+/* トラベルセット */
+.ordermade__tools-item-wrap {
+  position: relative;
+}
+
+.ordermade__tools-item-wrap::before {
+  content: '';
+  width: 100%;
+  height: calc(100% + 30px);
+  border: solid 1px rgba(51, 51, 51, 0.4);
+  position: absolute;
+  top: calc(50% + 20px);
+  left: 50%;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.ordermade__tools-item-wrap::after {
+  content: 'トラベルセット';
+  font-family: "Shippori Mincho", serif;
+  font-size: 20px;
+  font-weight: 500;
+  padding-inline: 10px;
+  background: #FFF;
+  position: absolute;
+  top: -13px;
+  left: 20px;
+}
+
+.ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools-item-wrap .ordermade__tools_item {
+  gap: 20px;
+  padding-inline: 30px;
+}
+
+@media screen and (max-width: 767px) {
+  .ordermade .ordermade__tools .ordermade__inner .ordermade__tools_content .ordermade__tools-item-wrap .ordermade__tools_item {
+    padding-inline: 15px;
+  }
+}

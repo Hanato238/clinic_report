@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#10b981" />
+    <title>Hanato Beauty Clinic｜美容クリニック</title>
+    <meta
+      name="description"
+      content="しみ・しわ・薄毛・脱毛など、お肌と髪の専門美容クリニック。オンライン予約・無料カウンセリング対応。"
+    />
+    <meta property="og:title" content="Hanato Beauty Clinic｜美容クリニック" />
+    <meta
+      property="og:description"
+      content="スマホでサクサク予約。LINEでもご相談いただけます。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/ogp.jpg" />
+    <meta
+      name="format-detection"
+      content="telephone=no, date=no, email=no, address=no"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind (CDN) for rapid styling; swap to a local build in production -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        --brand: #10b981;
+        --ink: #111827;
+        --muted: #6b7280;
+      }
+      html,
+      body {
+        font-family: "Noto Sans JP", system-ui, -apple-system,
+          "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+        color: var(--ink);
+      }
+      .safe {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+      }
+      .glass {
+        backdrop-filter: saturate(180%) blur(10px);
+        background: rgba(255, 255, 255, 0.75);
+      }
+      .btn {
+        @apply inline-flex items-center justify-center px-4 py-3 rounded-2xl text-sm font-medium shadow hover:opacity-90 active:opacity-80 transition;
+      }
+      .btn-primary {
+        background: var(--brand);
+        color: #fff;
+      }
+      .btn-outline {
+        border: 1px solid #e5e7eb;
+        color: #111827;
+        background: #fff;
+      }
+      .chip {
+        @apply text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700;
+      }
+      .section {
+        @apply safe px-4 max-w-screen-sm mx-auto;
+      }
+      .card {
+        @apply rounded-3xl shadow-sm border border-gray-100 bg-white;
+      }
+      .shadow-soft {
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.12);
+      }
+      .sticky-ios {
+        position: sticky;
+        position: -webkit-sticky;
+        top: 0;
+      }
+    </style>
+    <script>
+      // ====== CONFIG (編集してください) ======
+      const CONFIG = {
+        liffId: "YOUR_LIFF_ID_HERE", // ← あなたの LIFF ID
+        bookingUrl: "https://example.com/booking", // ← 予約ページ（Googleフォーム/Calendlyなど）
+        tel: "03-1234-5678",
+        lineOfficialUrl: "https://lin.ee/your-line-url", // 友だち追加用
+        addressText: "東京都新宿区1-2-3 ABCビル3F",
+        mapUrl: "https://maps.app.goo.gl/XXXXXXXX",
+        businessHours: "10:00-19:00（不定休）",
+      };
+
+      // ====== LIFF 初期化（通常ブラウザでも問題なく動作） ======
+      async function initLIFF() {
+        const $state = { inClient: false, loggedIn: false, profile: null };
+        if (
+          !window.liff ||
+          !CONFIG.liffId ||
+          CONFIG.liffId.includes("YOUR_LIFF_ID")
+        ) {
+          return $state; // SDK未読込 or LIFF ID未設定 → 通常Webとして続行
+        }
+        try {
+          await liff.init({ liffId: CONFIG.liffId });
+          $state.inClient = liff.isInClient();
+          $state.loggedIn = liff.isLoggedIn();
+          // 認証が不要な閲覧用ページ → 自動ログインはしない
+          // 予約やシェア時に必要ならログイン促進
+          return $state;
+        } catch (e) {
+          console.warn("LIFF init error:", e);
+          return $state;
+        }
+      }
+
+      // 必要時だけログイン
+      async function ensureLogin() {
+        if (liff && !liff.isLoggedIn()) {
+          liff.login({});
+          return false; // ここでリダイレクト
+        }
+        return true;
+      }
+
+      // LINE シェア（任意）
+      async function shareClinic() {
+        if (!window.liff) return alert("LINEアプリ内でご利用ください");
+        const ok = await ensureLogin();
+        if (!ok) return;
+        try {
+          if (liff.isApiAvailable("shareTargetPicker")) {
+            await liff.shareTargetPicker([
+              {
+                type: "text",
+                text: "Hanato Beauty Clinic｜スマホで予約できます。",
+              },
+              { type: "text", text: location.href },
+            ]);
+          } else {
+            liff.openWindow({ url: location.href, external: false });
+          }
+        } catch (e) {
+          alert("シェアに失敗しました");
+          console.error(e);
+        }
+      }
+
+      // 予約ボタン
+      async function openBooking() {
+        // LINE内→そのまま埋め込み、通常ブラウザ→新規タブ
+        const url = CONFIG.bookingUrl;
+        if (window.liff && liff.isInClient()) {
+          liff.openWindow({ url, external: false });
+        } else {
+          window.open(url, "_blank", "noopener");
+        }
+      }
+
+      // ブラウザで開く（LIFF内→外部ブラウザ遷移）
+      function openExternalBrowser() {
+        if (window.liff && liff.isInClient()) {
+          liff.openWindow({ url: location.href, external: true });
+        } else {
+          // すでに外部ブラウザ
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+
+      // DOM 構築後に初期化
+      document.addEventListener("DOMContentLoaded", async () => {
+        const state = await initLIFF();
+        // ヘッダーの表示微調整
+        const $lineCta = document.querySelectorAll("[data-line-only]");
+        const $webCta = document.querySelectorAll("[data-web-only]");
+        $lineCta.forEach(
+          (el) => (el.style.display = state.inClient ? "" : "none")
+        );
+        $webCta.forEach(
+          (el) => (el.style.display = state.inClient ? "none" : "")
+        );
+
+        // 電話リンク設定（iOSのハイライト対策で遅延セット）
+        document
+          .querySelectorAll("[data-tel]")
+          .forEach(
+            (a) => (a.href = `tel:${CONFIG.tel.replace(/[^0-9+]/g, "")}`)
+          );
+
+        // アクセス情報注入
+        document.querySelector("[data-address]").textContent =
+          CONFIG.addressText;
+        document.querySelector("[data-hours]").textContent =
+          CONFIG.businessHours;
+        document
+          .querySelector("[data-map]")
+          .setAttribute("href", CONFIG.mapUrl);
+        document
+          .querySelector("[data-line-add]")
+          .setAttribute("href", CONFIG.lineOfficialUrl);
+
+        // 予約ボタン
+        document
+          .querySelectorAll("[data-booking]")
+          .forEach((btn) => btn.addEventListener("click", openBooking));
+        // シェア
+        const shareBtn = document.getElementById("shareBtn");
+        if (shareBtn) shareBtn.addEventListener("click", shareClinic);
+        // 外部ブラウザで開く
+        const extBtn = document.getElementById("openExternal");
+        if (extBtn) extBtn.addEventListener("click", openExternalBrowser);
+      });
+    </script>
+    <!-- LINE LIFF SDK（任意。LIFFを使う場合のみ有効） -->
+    <script
+      src="https://static.line-scdn.net/liff/edge/2/sdk.js"
+      defer
+    ></script>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Top bar -->
+    <header class="sticky-ios z-50 top-0 glass safe">
+      <div class="section py-3 flex items-center gap-3">
+        <div class="flex-1">
+          <p class="text-xs text-gray-500">美容クリニック</p>
+          <h1 class="text-lg font-bold">Hanato Beauty Clinic</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <a class="btn btn-outline" data-web-only id="openExternal"
+            >ブラウザ</a
+          >
+          <a class="btn btn-outline" href="#access">アクセス</a>
+          <a class="btn btn-primary" data-booking>予約</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="relative">
+      <div
+        class="h-[42vh] max-h-[420px] w-full bg-center bg-cover"
+        style="
+          background-image: url('https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1600&auto=format&fit=crop');
+        "
+      ></div>
+      <div class="section -mt-10">
+        <div class="card p-5 shadow-soft">
+          <div class="flex items-start gap-4">
+            <div>
+              <span class="chip">初回カウンセリング無料</span>
+              <h2 class="text-2xl font-bold mt-2 leading-tight">
+                お肌と髪の総合ケアを、
+                <span class="text-emerald-600">スマホで完結</span>
+              </h2>
+              <p class="text-sm text-gray-600 mt-1">
+                しみ・しわ・毛穴・AGA・美肌・医療脱毛まで。医師が一人ひとりに合ったプランをご提案します。
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 flex gap-2">
+            <button class="btn btn-primary flex-1" data-booking>
+              今すぐ予約
+            </button>
+            <a class="btn btn-outline flex-1" id="shareBtn" data-line-only
+              >LINEでシェア</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="section mt-10">
+      <h3 class="text-xl font-bold">メニュー</h3>
+      <div class="grid grid-cols-2 gap-3 mt-3">
+        <article class="card p-4">
+          <p class="text-sm font-semibold">しみ取り・美白</p>
+          <p class="text-xs text-gray-500 mt-1">レーザー/トーニング/内服</p>
+        </article>
+        <article class="card p-4">
+          <p class="text-sm font-semibold">しわ・たるみ</p>
+          <p class="text-xs text-gray-500 mt-1">ボトックス/ヒアルロン酸</p>
+        </article>
+        <article class="card p-4">
+          <p class="text-sm font-semibold">毛穴・ニキビ</p>
+          <p class="text-xs text-gray-500 mt-1">ピーリング/光治療</p>
+        </article>
+        <article class="card p-4">
+          <p class="text-sm font-semibold">AGA/薄毛</p>
+          <p class="text-xs text-gray-500 mt-1">内服/外用/注入</p>
+        </article>
+        <article class="card p-4">
+          <p class="text-sm font-semibold">医療脱毛</p>
+          <p class="text-xs text-gray-500 mt-1">全身/部分/都度払い</p>
+        </article>
+        <article class="card p-4">
+          <p class="text-sm font-semibold">美肌点滴</p>
+          <p class="text-xs text-gray-500 mt-1">高濃度ビタミンCなど</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Doctor -->
+    <section class="section mt-10">
+      <h3 class="text-xl font-bold">医師紹介</h3>
+      <div class="card p-4 mt-3 flex gap-4">
+        <img
+          src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=1200&auto=format&fit=crop"
+          alt="Doctor"
+          class="w-20 h-20 rounded-2xl object-cover"
+        />
+        <div>
+          <p class="font-semibold">花戸 史也 医師</p>
+          <p class="text-sm text-gray-600 mt-1">
+            皮膚科・美容皮膚科。最新のエビデンスにもとづき、効果と安全性を両立する治療を心がけています。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="section mt-10" id="price">
+      <h3 class="text-xl font-bold">料金（目安）</h3>
+      <div class="mt-3 space-y-3">
+        <div class="card p-4">
+          <div class="flex justify-between items-center">
+            <p class="font-medium">しみ取り（1mm）</p>
+            <p class="font-bold">¥3,300〜</p>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">
+            診察・麻酔代別。状態により変動します。
+          </p>
+        </div>
+        <div class="card p-4">
+          <div class="flex justify-between items-center">
+            <p class="font-medium">ボトックス（額）</p>
+            <p class="font-bold">¥19,800〜</p>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">部位や量で前後します。</p>
+        </div>
+        <div class="card p-4">
+          <div class="flex justify-between items-center">
+            <p class="font-medium">男性AGA内服（30日）</p>
+            <p class="font-bold">¥7,700〜</p>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">初診料・血液検査は別途。</p>
+        </div>
+      </div>
+      <div class="mt-3 text-xs text-gray-500">
+        ※ 表示は税込の参考価格です。正確な費用は診察時にご案内します。
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section class="section mt-10">
+      <h3 class="text-xl font-bold">院内・施術イメージ</h3>
+      <div class="mt-3 grid grid-cols-3 gap-2">
+        <img
+          class="rounded-xl aspect-square object-cover"
+          src="https://images.unsplash.com/photo-1580281657527-47f249e8f5ec?q=80&w=1200&auto=format&fit=crop"
+          alt="clinic"
+        />
+        <img
+          class="rounded-xl aspect-square object-cover"
+          src="https://images.unsplash.com/photo-1556228453-efd1e7577923?q=80&w=1200&auto=format&fit=crop"
+          alt="room"
+        />
+        <img
+          class="rounded-xl aspect-square object-cover"
+          src="https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1200&auto=format&fit=crop"
+          alt="device"
+        />
+      </div>
+    </section>
+
+    <!-- Access -->
+    <section class="section mt-10" id="access">
+      <h3 class="text-xl font-bold">アクセス・ご連絡</h3>
+      <div class="card p-4 mt-3">
+        <div class="space-y-2 text-sm">
+          <p>
+            <span class="text-gray-500">住所：</span><span data-address></span>
+          </p>
+          <p>
+            <span class="text-gray-500">診療時間：</span
+            ><span data-hours></span>
+          </p>
+          <div class="grid grid-cols-2 gap-2 mt-3">
+            <a class="btn btn-outline" data-tel>電話する</a>
+            <a class="btn btn-outline" data-line-add target="_blank"
+              >LINEで相談</a
+            >
+            <a class="btn btn-outline col-span-2" data-map target="_blank"
+              >Googleマップで開く</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sticky booking bar -->
+    <div
+      class="fixed left-0 right-0 bottom-0 safe glass border-t border-gray-200"
+    >
+      <div class="section py-3 flex gap-2">
+        <button class="btn btn-primary flex-1" data-booking>ネット予約</button>
+        <a class="btn btn-outline" id="openExternal" data-line-only
+          >外部ブラウザ</a
+        >
+      </div>
+    </div>
+
+    <footer class="h-24"></footer>
+
+    <!-- JSON-LD 構造化データ（検索強化） -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "MedicalClinic",
+        "name": "Hanato Beauty Clinic",
+        "url": "https://example.com/",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "JP",
+          "addressLocality": "新宿区",
+          "addressRegion": "東京都",
+          "streetAddress": "1-2-3 ABCビル3F"
+        },
+        "telephone": "03-1234-5678",
+        "openingHours": "Mo-Su 10:00-19:00",
+        "medicalSpecialty": ["Dermatology", "CosmeticSurgery"],
+        "sameAs": ["https://lin.ee/your-line-url"]
+      }
+    </script>
+  </body>
+</html>

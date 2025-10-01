@@ -1,0 +1,6 @@
+=== Run Summary ===
+Temp root: /workspaces/clinic_report/sample_data/pdf/temp_20250928
+Filtered images: /workspaces/clinic_report/sample_data/pdf/temp_20250928/filtered_images
+Tricho data: /workspaces/clinic_report/sample_data/pdf/temp_20250928/tricho_data.json
+Images (filtered/renamed): 4/4
+temp_extracted_images, report_metadata.json, tricho_analysis.json は削除済みです。

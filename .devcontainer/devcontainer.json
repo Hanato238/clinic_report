@@ -1,0 +1,46 @@
+{
+  "name": "Python + Node + Puppeteer",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.linting.pylintEnabled": true,
+        "python.linting.enabled": true,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[html]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+        "[css]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+        "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+        "liveServer.settings.port": 5500
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "eamodio.gitlens",
+        "esbenp.prettier-vscode",
+        "github.copilot",
+        "github.copilot-chat",
+        "github.vscode-pull-request-github",
+        "ms-ceintl.vscode-language-pack-ja",
+        "ms-python.debugpy",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.vscode-python-envs",
+        "njpwerner.autodocstring",
+        "ritwickdey.liveserver",
+        "shd101wyy.markdown-preview-enhanced",
+        "visualstudioexptteam.intellicode-api-usage-examples",
+        "visualstudioexptteam.vscodeintellicode"
+      ]
+    }
+  },
+  "containerEnv": {
+    "PUPPETEER_SKIP_DOWNLOAD": "true",
+    "PUPPETEER_EXECUTABLE_PATH": "/usr/bin/chromium"
+  },
+  "forwardPorts": [3000, 8000, 5500, 9229],
+  "postCreateCommand": "node -v && npm -v && ( [ -f package-lock.json ] && npm ci || npm install ); pip install --upgrade pip && if [ -f requirements.txt ]; then pip install -r requirements.txt; fi",
+  "remoteUser": "vscode"
+}

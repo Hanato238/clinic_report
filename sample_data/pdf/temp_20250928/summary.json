@@ -1,0 +1,13 @@
+{
+  "temp_root": "/workspaces/clinic_report/sample_data/pdf/temp_20250928",
+  "filtered_images_dir": "/workspaces/clinic_report/sample_data/pdf/temp_20250928/filtered_images",
+  "final_report_json": "/workspaces/clinic_report/sample_data/pdf/temp_20250928/tricho_data.json",
+  "image_counts": {
+    "filtered": 4,
+    "renamed": 4
+  },
+  "notes": [
+    "temp_extracted_images は削除済みです。",
+    "report_metadata.json と tricho_analysis.json は削除済みです。"
+  ]
+}

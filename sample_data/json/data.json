@@ -1,0 +1,106 @@
+[
+  {
+    "location": "Frontal 1 left",
+    "data": {
+      "roi": {
+        "width_mm": 5.34,
+        "height_mm": 16.09,
+        "area_cm2": 0.86
+      },
+      "counts": {
+        "follicles": 73,
+        "hairs": 97
+      },
+      "classification": {
+        "<30 μm": 25,
+        "30-60 μm": 37,
+        "60-90 μm": 20,
+        ">90 μm": 15
+      },
+      "density_per_cm2": {
+        "<30 μm": 29.08,
+        "30-60 μm": 43.04,
+        "60-90 μm": 23.27,
+        ">90 μm": 17.45
+      }
+    }
+  },
+  {
+    "location": "Frontal 2",
+    "data": {
+      "roi": {
+        "width_mm": 5.34,
+        "height_mm": 16.09,
+        "area_cm2": 0.86
+      },
+      "counts": {
+        "follicles": 86,
+        "hairs": 106
+      },
+      "classification": {
+        "<30 μm": 0,
+        "30-60 μm": 12,
+        "60-90 μm": 71,
+        ">90 μm": 23
+      },
+      "density_per_cm2": {
+        "<30 μm": 0.0,
+        "30-60 μm": 13.96,
+        "60-90 μm": 82.6,
+        ">90 μm": 26.76
+      }
+    }
+  },
+  {
+    "location": "Vertex center",
+    "data": {
+      "roi": {
+        "width_mm": 5.34,
+        "height_mm": 16.09,
+        "area_cm2": 0.86
+      },
+      "counts": {
+        "follicles": 62,
+        "hairs": 109
+      },
+      "classification": {
+        "<30 μm": 0,
+        "30-60 μm": 13,
+        "60-90 μm": 41,
+        ">90 μm": 55
+      },
+      "density_per_cm2": {
+        "<30 μm": 0.0,
+        "30-60 μm": 15.12,
+        "60-90 μm": 47.7,
+        ">90 μm": 63.98
+      }
+    }
+  },
+  {
+    "location": "Occiput 3 right",
+    "data": {
+      "roi": {
+        "width_mm": 5.34,
+        "height_mm": 16.09,
+        "area_cm2": 0.86
+      },
+      "counts": {
+        "follicles": 56,
+        "hairs": 101
+      },
+      "classification": {
+        "<30 μm": 0,
+        "30-60 μm": 8,
+        "60-90 μm": 43,
+        ">90 μm": 50
+      },
+      "density_per_cm2": {
+        "<30 μm": 0.0,
+        "30-60 μm": 9.31,
+        "60-90 μm": 50.02,
+        ">90 μm": 58.17
+      }
+    }
+  }
+]

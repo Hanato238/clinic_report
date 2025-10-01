@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tricho Report (Printable)</title>
+    <style>
+      /* 印刷設定 */
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+      :root {
+        --text: #222;
+        --muted: #6b7280;
+        --line: #d1d5db;
+        --accent: #14b8a6;
+        --chip-bg: #f0fdfa;
+        /* 棒グラフ色 */
+        --u30: #991b1b; /* <30µm 暗い赤 */
+        --r30_60: #fb923c; /* 30–60µm 橙 */
+        --r60_90: #d9f99d; /* 60–90µm 薄黄緑 */
+        --g90: #065f46; /* >90µm 暗い緑 */
+        /* AGA疑い背景 */
+        --suspect-bg: #fee2e2;
+        --suspect-border: #fca5a5;
+        /* 判定バッジ色（サンプル風） */
+        --badge-thin: #f59e0b; /* 薄毛=橙 */
+        --badge-normal: #3b82f6; /* 正常=青 */
+        --font: "Noto Sans JP", "Meiryo", "Hiragino Kaku Gothic ProN", system-ui,
+          -apple-system, sans-serif;
+        --wrap-border: #e5e7eb;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font);
+        color: var(--text);
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        font-size: 9pt;
+        line-height: 1.32;
+      }
+
+      /* A4横 内側幅（白紙2ページ防止の安全幅） */
+      .page {
+        width: 100%;
+        max-width: 274mm;
+        margin: 0 auto;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+      }
+
+      /* 全体外枠（角丸） */
+      .report-wrap {
+        border: 0.6pt solid var(--wrap-border);
+        border-radius: 10pt;
+        padding: 6mm;
+        display: grid;
+        gap: 4mm;
+        grid-template-rows: auto auto 1fr auto;
+        background: #fff;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+      }
+
+      /* ヘッダ */
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-bottom: 5mm;
+        border-bottom: 1pt solid var(--line);
+      }
+      .title {
+        font-weight: 800;
+        font-size: 12pt; /* ←少し小さく */
+        line-height: 1.1; /* ←行間圧縮 */
+      }
+      .meta {
+        font-size: 7.5pt; /* ←さらに小さく */
+        color: var(--muted);
+        display: flex; /* ←縦並びから横並びに */
+        gap: 6mm; /* ←間隔 */
+        flex-wrap: wrap; /* ←狭い場合は折返し */
+        text-align: right;
+      }
+      .meta b {
+        color: #111;
+      }
+
+      /* カード群：4枚横並び */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 3mm;
+      }
+      .card {
+        position: relative;
+        border: 0.6pt solid var(--line);
+        border-radius: 6pt;
+        background: #fff;
+        padding: 2.4mm;
+        display: grid;
+        gap: 1.8mm;
+        grid-auto-rows: min-content;
+        overflow: visible; /* バッジをはみ出して表示 */
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+      }
+      .card.suspect {
+        background: var(--suspect-bg);
+        border-color: var(--suspect-border);
+        box-shadow: 0 0 0 1pt var(--suspect-border) inset;
+      }
+
+      /* 判定バッジ（カード左上） */
+      .judge-badge {
+        position: absolute;
+        top: -12px;
+        left: -12px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9pt;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        color: #fff;
+        box-shadow: 0 0 0 2px #fff;
+        border: 2px solid currentColor;
+      }
+      .judge-badge.thin {
+        background: var(--badge-thin);
+        color: var(--badge-thin);
+      }
+      .judge-badge.thin span {
+        color: #fff;
+      }
+      .judge-badge.normal {
+        background: var(--badge-normal);
+        color: var(--badge-normal);
+      }
+      .judge-badge.normal span {
+        color: #fff;
+      }
+
+      /* タイトル類：バッジと重ならないオフセット */
+      .name {
+        font-weight: 700;
+        font-size: 9.6pt;
+        margin-left: 30px;
+      }
+      .roi {
+        font-size: 7.2pt;
+        color: var(--muted);
+        justify-self: end;
+      }
+
+      /* 100%バー（4区分）＋カットライン */
+      .bar100 {
+        position: relative;
+        width: 100%;
+        height: 7mm;
+        display: flex;
+        border: 0.5pt solid var(--line);
+        border-radius: 3pt;
+        overflow: hidden;
+      }
+      .seg-ultra {
+        background: var(--u30);
+      }
+      .seg-thin {
+        background: var(--r30_60);
+      }
+      .seg-mid {
+        background: var(--r60_90);
+      }
+      .seg-thick {
+        background: var(--g90);
+      }
+      .cutlines {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .cutline {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        border-left: 1.1pt dashed rgba(0, 0, 0, 0.55);
+      }
+      .cutline small {
+        position: absolute;
+        bottom: 0;
+        transform: translate(2px, 0);
+        font-size: 6.3pt;
+        background: rgba(255, 255, 255, 0.75);
+        padding: 0 2px;
+        border-radius: 2px;
+        color: #111;
+      }
+
+      .legend {
+        display: flex;
+        gap: 2.5mm;
+        align-items: center;
+        font-size: 6.8pt;
+        color: var(--muted);
+        justify-self: end;
+      }
+      .lg {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+      .lg i {
+        width: 7px;
+        height: 7px;
+        border-radius: 2px;
+        display: inline-block;
+      }
+
+      /* 数値表（見やすく） */
+      .metrics {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      .metrics th,
+      .metrics td {
+        border: 0.5pt solid var(--line);
+        padding: 1.8px 3px;
+        text-align: center;
+        white-space: nowrap;
+      }
+      .metrics th {
+        background: #f9fafb;
+        font-size: 8.2pt;
+      }
+      .metrics td {
+        font-size: 10.4pt;
+        font-weight: 700;
+      }
+
+      /* 画像を大きく（高さ2倍相当） */
+      .imgs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.2mm;
+        max-height: 34mm;
+        overflow: hidden;
+      }
+      .imgbox {
+        border: 0.4pt solid var(--line);
+        border-radius: 3pt;
+        padding: 1.2mm;
+        display: grid;
+        gap: 1mm;
+      }
+      .imgbox .cap {
+        font-size: 7pt;
+        color: var(--muted);
+      }
+      .imgbox img {
+        width: 100%;
+        max-height: 30mm;
+        aspect-ratio: 1/1;
+        object-fit: contain;
+      }
+
+      /* 下段：左（ロジック→コメント）／右（HN） */
+      .bottom {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 3mm;
+      }
+      .leftcol {
+        display: grid;
+        gap: 3mm;
+      }
+
+      /* 小さめにしてコンパクト化 */
+      .logic {
+        border: 0.6pt solid var(--line);
+        border-radius: 6pt;
+        padding: 2mm;
+        font-size: 6.2pt;
+        line-height: 1.15;
+      }
+      .logic h3 {
+        margin: 0 0 0.8mm;
+        font-size: 7pt;
+      }
+      .logic ul {
+        margin: 0;
+        padding-left: 12px;
+      }
+      .mini {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: 6pt;
+        margin-top: 1mm;
+      }
+      .mini th,
+      .mini td {
+        border: 0.4pt solid var(--line);
+        padding: 1px 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .mini th {
+        background: #f9fafb;
+      }
+
+      .comment {
+        border: 0.6pt solid var(--line);
+        border-radius: 6pt;
+        background: var(--chip-bg);
+        padding: 1.8mm;
+        font-size: 6.6pt;
+        line-height: 1.2;
+      }
+      .comment h3 {
+        margin: 0 0 0.8mm;
+        font-size: 7pt;
+      }
+
+      .hn {
+        border: 0.6pt solid var(--line);
+        border-radius: 6pt;
+        padding: 1.8mm;
+        display: grid;
+        gap: 1.6mm;
+        font-size: 6.6pt;
+        line-height: 1.2;
+      }
+      .hn h3 {
+        margin: 0;
+        font-size: 7.2pt;
+      }
+      .hn-list {
+        display: grid;
+        gap: 1.2mm;
+      }
+      .hn-item {
+        padding: 1.4mm;
+        border: 0.6pt solid var(--line);
+        border-radius: 4pt;
+        display: flex;
+        justify-content: space-between;
+      }
+      .hn-item.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1pt var(--accent) inset;
+      }
+
+      footer {
+        border-top: 0.3pt solid var(--line);
+        padding-top: 2mm;
+        font-size: 6.6pt;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="report-wrap">
+        <div id="page"></div>
+      </div>
+    </div>
+
+    <script>
+      /* ========= helpers ========= */
+      const fmtPct = (v) => (v * 100).toFixed(0) + "%";
+      const fmtPct1 = (v) => (v * 100).toFixed(1) + "%";
+      const fmtNum = (v) => (Math.round(v * 10) / 10).toFixed(1);
+      const clamp01 = (v) => Math.max(0, Math.min(1, v));
+
+      function judgeRegion(p, th) {
+        const cond1 = p.p60 >= th.thin60; // <60µm
+        const cond2 = p.ratio <= th.ratio_max || p.p30 >= th.ultra30; // ratio or <30µm
+        const pass = cond1 && cond2; // AGA疑い
+        let tag = "正常",
+          cls = "ok";
+        if (cond1 && !cond2) {
+          tag = "境界";
+          cls = "warn";
+        }
+        if (pass) {
+          tag = "AGA疑い";
+          cls = "bad";
+        }
+        return { pass, tag, cls, cond1, cond2 };
+      }
+
+      function estimateHN(scores) {
+        const s = Object.fromEntries(scores.map((r) => [r.name, r.score]));
+        const f = s["前額角"] || 0,
+          vtx = s["つむじ"] || 0,
+          top = s["頭頂部"] || 0;
+        const total = f + vtx + top;
+        if (total <= 0) return "I";
+        if (f >= 1 && !vtx && !top) return f >= 2 ? "III" : "II";
+        if (vtx >= 1 && !f && !top)
+          return vtx >= 2 ? "III Vertex" : "II Vertex";
+        if ((f >= 1 && vtx >= 1) || top >= 1) {
+          if (total <= 2) return "IV";
+          if (total === 3) return "V";
+          if (total === 4 || total === 5) return "VI";
+          return "VII";
+        }
+        return "II";
+      }
+
+      function mapName(location) {
+        const s = (location || "").toLowerCase();
+        if (s.includes("frontal 1")) return "前額角";
+        if (s.includes("frontal 2")) return "頭頂部";
+        if (s.includes("vertex")) return "つむじ";
+        if (s.includes("occiput")) return "後頭部";
+        console.error("未知の部位:", location);
+        return `不明(${location})`;
+      }
+
+      function normalizeFromInput(arr) {
+        const pref = ["前額角", "頭頂部", "つむじ", "後頭部"];
+        const tmp = arr.map((it) => {
+          const name = mapName(it.location);
+          const d = it.data || {},
+            c = d.counts || {},
+            cls = d.classification || {};
+          const hairs = c.hairs ?? 0,
+            follicles = c.follicles ?? 0;
+          const n_u30 = cls["<30 μm"] ?? 0,
+            n_30_60 = cls["30-60 μm"] ?? 0,
+            n_60_90 = cls["60-90 μm"] ?? 0,
+            n_g90 = cls[">90 μm"] ?? 0;
+          const total = Math.max(hairs, n_u30 + n_30_60 + n_60_90 + n_g90) || 1;
+          const area_mm2 =
+            d.roi?.area_cm2 != null
+              ? d.roi.area_cm2 * 100
+              : d.roi?.width_mm && d.roi?.height_mm
+              ? d.roi.width_mm * d.roi.height_mm
+              : null;
+          return {
+            name,
+            area_mm2,
+            hairs,
+            follicles,
+            p30: clamp01(n_u30 / total),
+            p60: clamp01((n_u30 + n_30_60) / total),
+            pMid: clamp01(n_60_90 / total),
+            pThick: clamp01(n_g90 / total),
+          };
+        });
+        const merged = {};
+        for (const r of tmp) {
+          if (!merged[r.name]) merged[r.name] = { ...r, parts: 1 };
+          else {
+            const m = merged[r.name];
+            m.parts++;
+            m.hairs += r.hairs;
+            m.follicles += r.follicles;
+            m.p30 += r.p30;
+            m.p60 += r.p60;
+            m.pMid += r.pMid;
+            m.pThick += r.pThick;
+            m.area_mm2 = (m.area_mm2 ?? 0) + (r.area_mm2 ?? 0);
+          }
+        }
+        const regions = Object.values(merged).map((m) => ({
+          name: m.name,
+          area_mm2: m.area_mm2 != null ? m.area_mm2 : null,
+          hairs: m.hairs,
+          follicles: m.follicles,
+          p30: m.p30 / m.parts,
+          p60: m.p60 / m.parts,
+          pMid: m.pMid / m.parts,
+          pThick: m.pThick / m.parts,
+        }));
+        regions.sort((a, b) => pref.indexOf(a.name) - pref.indexOf(b.name));
+        return regions;
+      }
+
+      /* ========= DOM builders ========= */
+      function elHeader(meta) {
+        const h = document.createElement("header");
+        h.innerHTML = `
+    <div class="title">${meta.patientName ?? "-"} さんの検査結果　${
+          meta.examDate ?? "-"
+        }</div>
+    <div class="meta">
+      <div>患者氏名：<b>${meta.patientName ?? "-"}</b></div>
+      <div>生年月日：<b>${meta.birthDate ?? "-"}</b></div>
+      <div>検査日：<b>${meta.examDate ?? "-"}</b></div>
+    </div>`;
+        return h;
+      }
+
+      function elCard() {
+        const s = document.createElement("section");
+        s.className = "card";
+        s.innerHTML = `
+    <div class="judge-badge normal" data-judge-badge><span>正常</span></div>
+    <div class="name" data-name>部位</div>
+    <div class="roi" data-roi>ROI: -- mm²</div>
+
+    <div class="bar100" data-bar>
+      <div class="seg-ultra" title="<30µm"></div>
+      <div class="seg-thin"  title="30–60µm"></div>
+      <div class="seg-mid"   title="60–90µm"></div>
+      <div class="seg-thick" title=">90µm"></div>
+      <div class="cutlines">
+        <div class="cutline" data-cut-ultra><small>&lt;30µm 基準</small></div>
+        <div class="cutline" data-cut-thin ><small>&lt;60µm 基準</small></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span class="lg"><i style="background:var(--u30)"></i>&lt;30µm</span>
+      <span class="lg"><i style="background:var(--r30_60)"></i>30–60µm</span>
+      <span class="lg"><i style="background:var(--r60_90)"></i>60–90µm</span>
+      <span class="lg"><i style="background:var(--g90)"></i>&gt;90µm</span>
+    </div>
+
+    <table class="metrics">
+      <thead><tr>
+        <th>毛髪/毛包比</th>
+        <th>&lt;60µm 比率</th>
+        <th>&lt;30µm 比率</th>
+      </tr></thead>
+      <tbody><tr>
+        <td data-ratio>--</td>
+        <td data-p60>--</td>
+        <td data-p30>--</td>
+      </tr></tbody>
+    </table>
+
+    <div class="imgs" data-imgs>
+      <div class="imgbox"><div class="cap">基準（A）</div>
+        <img alt="normal" data-img-normal onerror="this.closest('.imgs').style.display='none'"/>
+      </div>
+      <div class="imgbox"><div class="cap">本人（B）</div>
+        <img alt="patient" data-img-patient onerror="this.closest('.imgs').style.display='none'"/>
+      </div>
+    </div>`;
+        return s;
+      }
+
+      function elLogic(th) {
+        const s = document.createElement("section");
+        s.className = "logic";
+        s.innerHTML = `
+    <h3>判定ロジック</h3>
+    <ul>
+      <li>基準1：&lt;60µm（③） ≥ <b id="th-thin">${(th.thin60 * 100).toFixed(
+        0
+      )}%</b></li>
+      <li>基準2：毛髪/毛包比（②） ≤ <b id="th-ratio">${th.ratio_max.toFixed(
+        2
+      )}</b> または &lt;30µm（④） ≥ <b id="th-ultra">${(
+          th.ultra30 * 100
+        ).toFixed(0)}%</b></li>
+    </ul>
+    <table class="mini" id="mini"><thead><tr>
+      <th>部位</th><th>③ &lt;60µm</th><th>④ &lt;30µm</th><th>② 毛髪/毛包比</th><th>判定</th>
+    </tr></thead><tbody></tbody></table>`;
+        return s;
+      }
+
+      function elComment() {
+        const s = document.createElement("section");
+        s.className = "comment";
+        s.innerHTML = `<h3>医師コメント</h3><p id="comment">所見自動生成エリア。</p>`;
+        return s;
+      }
+
+      function elHN() {
+        const a = document.createElement("aside");
+        a.className = "hn";
+        a.innerHTML = `<h3>Hamilton–Norwood 分類</h3><div class="hn-list" id="hn-list"></div><div class="right"><strong id="hn-final">推定: －</strong></div>`;
+        return a;
+      }
+
+      function elFooter() {
+        const f = document.createElement("footer");
+        f.innerHTML = `<div>ppmm/ROI: 太さ[µm] = px/ppmm×1000, 面積[mm²]=(w×h)/ppmm²</div><div class="right">Generated by TrichoReport v1.7</div>`;
+        return f;
+      }
+
+      /* ========= main render ========= */
+      function fileKeyFromRegion(jpName) {
+        switch (jpName) {
+          case "前額角":
+            return "frontal_1_left";
+          case "頭頂部":
+            return "frontal_2";
+          case "つむじ":
+            return "vertex_center";
+          case "後頭部":
+            return "occipital";
+          default:
+            return null;
+        }
+      }
+
+      function renderReportFromJson(inputArr, opts = {}) {
+        const page = document.getElementById("page");
+        page.innerHTML = "";
+        const meta = {
+          patientName: opts.patientName ?? "-",
+          birthDate: opts.birthDate ?? "-",
+          examDate: opts.examDate ?? new Date().toLocaleDateString("ja-JP"),
+        };
+        const th = {
+          thin60: 0.3,
+          ratio_max: 1.8,
+          ultra30: 0.15,
+          ...(opts.thresholds || {}),
+        };
+
+        /* ヘッダ */
+        page.appendChild(elHeader(meta));
+
+        /* カード群 */
+        const wrap = document.createElement("section");
+        wrap.className = "cards";
+        page.appendChild(wrap);
+
+        const regions = normalizeFromInput(inputArr);
+        const per = [],
+          rows = [];
+
+        for (let i = 0; i < Math.min(4, regions.length); i++) {
+          const r = regions[i],
+            card = elCard();
+          wrap.appendChild(card);
+
+          const ratio = r.follicles ? r.hairs / r.follicles : 0;
+          const j = judgeRegion({ p60: r.p60, p30: r.p30, ratio }, th);
+
+          if (j.pass) card.classList.add("suspect");
+
+          /* バッジ文言 */
+          const badge = card.querySelector("[data-judge-badge]");
+          if (j.pass) {
+            badge.classList.remove("normal");
+            badge.classList.add("thin");
+            badge.innerHTML = "<span>薄毛</span>";
+          } else {
+            badge.classList.remove("thin");
+            badge.classList.add("normal");
+            badge.innerHTML = "<span>正常</span>";
+          }
+
+          card.querySelector("[data-name]").textContent = r.name;
+          card.querySelector("[data-roi]").textContent = `ROI: ${
+            r.area_mm2 != null ? fmtNum(r.area_mm2) : "--"
+          } mm²`;
+
+          /* 棒グラフ */
+          const seg = card.querySelector("[data-bar]").children;
+          seg[0].style.width = (r.p30 * 100).toFixed(0) + "%";
+          seg[1].style.width =
+            (Math.max(0, r.p60 - r.p30) * 100).toFixed(0) + "%";
+          seg[2].style.width = (r.pMid * 100).toFixed(0) + "%";
+          seg[3].style.width = (r.pThick * 100).toFixed(0) + "%";
+          card.querySelector("[data-cut-ultra]").style.left =
+            th.ultra30 * 100 + "%";
+          card.querySelector("[data-cut-thin]").style.left =
+            th.thin60 * 100 + "%";
+
+          /* 数値 */
+          card.querySelector("[data-ratio]").textContent = ratio.toFixed(2);
+          card.querySelector("[data-p60]").textContent = fmtPct(r.p60);
+          card.querySelector("[data-p30]").textContent = fmtPct(r.p30);
+
+          per.push({ name: r.name, p30: r.p30, p60: r.p60, ratio, judge: j });
+          rows.push(
+            `<tr><td>${r.name}</td><td>${fmtPct(r.p60)}</td><td>${fmtPct(
+              r.p30
+            )}</td><td>${ratio.toFixed(2)}</td><td>${j.tag}</td></tr>`
+          );
+
+          /* 画像（デモ既定：./sample_images/<key>.png） */
+          const key = fileKeyFromRegion(r.name);
+          const n = card.querySelector("[data-img-normal]"),
+            p = card.querySelector("[data-img-patient]");
+          if (key) {
+            const baseA = opts.images?.normalBaseUrl ?? "./sample_images/";
+            const baseB = opts.images?.patientBaseUrl ?? "./sample_images/";
+            const ext = opts.images?.ext ?? "png";
+            n.src = `${baseA}${key}.${ext}`;
+            p.src = `${baseB}${key}.${ext}`;
+          } else {
+            card.querySelector("[data-imgs]").style.display = "none";
+          }
+        }
+
+        /* 下段：判定ロジック→医師コメント ／ HN（どちらも縮小） */
+        const bottom = document.createElement("section");
+        bottom.className = "bottom";
+        page.appendChild(bottom);
+        const left = document.createElement("div");
+        left.className = "leftcol";
+        bottom.appendChild(left);
+
+        const logic = elLogic(th);
+        left.appendChild(logic);
+        logic.querySelector("#mini tbody").innerHTML = rows.join("");
+
+        const com = elComment();
+        left.appendChild(com);
+        const scores = per.map((r) => ({
+          name: r.name,
+          score: r.judge.pass ? 2 : r.judge.cond1 ? 1 : 0,
+        }));
+        const stage = estimateHN(scores);
+        const pos = per.filter((r) => r.judge.pass);
+        com.querySelector("#comment").innerHTML =
+          pos.length === 0
+            ? "全領域で基準未満です。撮影条件とROIの一貫性を保ち、経過観察を推奨します。"
+            : `${pos
+                .map(
+                  (r) =>
+                    `${r.name}で&lt;60µm: ${fmtPct1(
+                      r.p60
+                    )}, 毛髪/毛包比: ${r.ratio.toFixed(2)}`
+                )
+                .join(
+                  "、"
+                )} にて細毛化が示唆されます。Hamilton–Norwood分類は ${stage} 相当を示唆します。`;
+
+        const hn = elHN();
+        bottom.appendChild(hn);
+        hn.querySelector("#hn-final").textContent = "推定: " + stage;
+        const list = hn.querySelector("#hn-list");
+        for (const lb of [
+          "I",
+          "II",
+          "III",
+          "III Vertex",
+          "IV",
+          "V",
+          "VI",
+          "VII",
+        ]) {
+          const d = document.createElement("div");
+          d.className = "hn-item" + (lb === stage ? " active" : "");
+          d.innerHTML = `<span>Stage ${lb}</span><span class="muted">参考</span>`;
+          list.appendChild(d);
+        }
+
+        page.appendChild(elFooter());
+      }
+      window.renderReportFromJson = renderReportFromJson;
+
+      /* ========= DEMO（画像は ./sample_images/ に配置） ========= */
+      const DEMO_DATA = [
+        {
+          location: "Frontal 1 left",
+          data: {
+            roi: { width_mm: 5.4, height_mm: 16.2 },
+            counts: { follicles: 78, hairs: 112 },
+            classification: {
+              "<30 μm": 26,
+              "30-60 μm": 38,
+              "60-90 μm": 34,
+              ">90 μm": 14,
+            },
+          },
+        },
+        {
+          location: "Frontal 2",
+          data: {
+            roi: { area_cm2: 0.82 },
+            counts: { follicles: 70, hairs: 118 },
+            classification: {
+              "<30 μm": 22,
+              "30-60 μm": 48,
+              "60-90 μm": 30,
+              ">90 μm": 18,
+            },
+          },
+        },
+        {
+          location: "Vertex",
+          data: {
+            roi: { width_mm: 6.0, height_mm: 15.0 },
+            counts: { follicles: 64, hairs: 90 },
+            classification: {
+              "<30 μm": 12,
+              "30-60 μm": 28,
+              "60-90 μm": 32,
+              ">90 μm": 18,
+            },
+          },
+        },
+        {
+          location: "Occiput",
+          data: {
+            roi: { area_cm2: 0.95 },
+            counts: { follicles: 85, hairs: 132 },
+            classification: {
+              "<30 μm": 8,
+              "30-60 μm": 22,
+              "60-90 μm": 54,
+              ">90 μm": 48,
+            },
+          },
+        },
+      ];
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const external = window.__TRICHO_INPUT__ || null;
+        if (external) {
+          renderReportFromJson(external.arr || external, external.opts || {});
+        } else {
+          renderReportFromJson(DEMO_DATA, {
+            patientName: "山田太郎",
+            birthDate: "1980-01-01",
+            examDate: new Date().toLocaleDateString("ja-JP"), // 題名は年月日のみ
+            thresholds: { thin60: 0.3, ultra30: 0.15, ratio_max: 1.8 },
+            images: {
+              normalBaseUrl: "./sample_images/",
+              patientBaseUrl: "./sample_images/",
+              ext: "png",
+            },
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
