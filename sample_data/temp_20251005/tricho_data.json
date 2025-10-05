@@ -1,0 +1,116 @@
+{
+  "report_metadata": {
+    "error": "レポート行の解析に失敗しました。",
+    "raw": "HairMetrix のレポート a • 診察： 2025/10/05"
+  },
+  "tricho_analysis": [
+    {
+      "location": "Frontal 1 left",
+      "data": {
+        "roi": {
+          "width_mm": 5.34,
+          "height_mm": 16.09,
+          "area_cm2": 0.86
+        },
+        "counts": {
+          "follicles": 59,
+          "hairs": 70
+        },
+        "classification": {
+          "<30 μm": 9,
+          "30-60 μm": 44,
+          "60-90 μm": 14,
+          ">90 μm": 3
+        },
+        "density_per_cm2": {
+          "<30 μm": 10.47,
+          "30-60 μm": 51.19,
+          "60-90 μm": 16.29,
+          ">90 μm": 3.49
+        }
+      },
+      "file": "tricho_0.json"
+    },
+    {
+      "location": "Mid",
+      "data": {
+        "roi": {
+          "width_mm": 5.34,
+          "height_mm": 16.09,
+          "area_cm2": 0.86
+        },
+        "counts": {
+          "follicles": 65,
+          "hairs": 101
+        },
+        "classification": {
+          "<30 μm": 0,
+          "30-60 μm": 6,
+          "60-90 μm": 21,
+          ">90 μm": 74
+        },
+        "density_per_cm2": {
+          "<30 μm": 0.0,
+          "30-60 μm": 6.98,
+          "60-90 μm": 24.43,
+          ">90 μm": 86.09
+        }
+      },
+      "file": "tricho_1.json"
+    },
+    {
+      "location": "Vertex center",
+      "data": {
+        "roi": {
+          "width_mm": 5.34,
+          "height_mm": 16.09,
+          "area_cm2": 0.86
+        },
+        "counts": {
+          "follicles": 72,
+          "hairs": 106
+        },
+        "classification": {
+          "<30 μm": 1,
+          "30-60 μm": 7,
+          "60-90 μm": 23,
+          ">90 μm": 75
+        },
+        "density_per_cm2": {
+          "<30 μm": 1.16,
+          "30-60 μm": 8.14,
+          "60-90 μm": 26.76,
+          ">90 μm": 87.25
+        }
+      },
+      "file": "tricho_2.json"
+    },
+    {
+      "location": "Occiput 3 right",
+      "data": {
+        "roi": {
+          "width_mm": 5.34,
+          "height_mm": 16.09,
+          "area_cm2": 0.86
+        },
+        "counts": {
+          "follicles": 65,
+          "hairs": 91
+        },
+        "classification": {
+          "<30 μm": 1,
+          "30-60 μm": 6,
+          "60-90 μm": 28,
+          ">90 μm": 56
+        },
+        "density_per_cm2": {
+          "<30 μm": 1.16,
+          "30-60 μm": 6.98,
+          "60-90 μm": 32.57,
+          ">90 μm": 65.15
+        }
+      },
+      "file": "tricho_3.json"
+    }
+  ]
+}

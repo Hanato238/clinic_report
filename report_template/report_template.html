@@ -424,7 +424,7 @@
       function mapName(location) {
         const s = (location || "").toLowerCase();
         if (s.includes("frontal 1")) return "前額角";
-        if (s.includes("frontal 2")) return "頭頂部";
+        if (s.includes("mid")) return "頭頂部";
         if (s.includes("vertex")) return "つむじ";
         if (s.includes("occiput")) return "後頭部";
         console.error("未知の部位:", location);
@@ -603,7 +603,7 @@
           case "前額角":
             return "frontal_1_left";
           case "頭頂部":
-            return "frontal_2";
+            return "mid";
           case "つむじ":
             return "vertex_center";
           case "後頭部":
@@ -780,7 +780,7 @@
           },
         },
         {
-          location: "Frontal 2",
+          location: "Mid",
           data: {
             roi: { area_cm2: 0.82 },
             counts: { follicles: 70, hairs: 118 },
