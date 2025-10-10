@@ -6,6 +6,7 @@
     "makepdf": "node report_template/render.js"
   },
   "dependencies": {
-    "puppeteer": "^24.23.0"
+    "puppeteer": "^24.23.0",
+    "prettier" : "^3.6.2"
   }
 }

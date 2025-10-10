@@ -27,12 +27,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Node.js パッケージをインストール（prettier + puppeteer）
-RUN npm install -g prettier \
-    && npm install puppeteer
+# Node.js パッケージをインストール
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
 
 # リモートデバッグ用ユーザー（非rootでChromeサンドボックス問題を回避しやすい）
 RUN useradd -ms /bin/bash vscode
