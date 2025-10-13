@@ -15,3 +15,9 @@
 　　・患者データの作成
 　・撮影部位の指定
 　・作成されたレポートの表示
+
+
+使い方
+
+python ./deta_extractor ./sample_data/path ./sample_data/HairReport.pdf
+node ./report_template ./sample_data/TempPath

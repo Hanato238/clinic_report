@@ -1,0 +1,145 @@
+@startuml
+title tricho-pipeline – Overall Dependency Map
+
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment left
+
+' ==============================
+' Modules (Python)
+' ==============================
+namespace tricho_pipeline.core {
+  class PipelineConfig <<module>> {
+    +from_args(...)
+    +json_dir: str
+    +pdf_path: str
+    +out_root: str?
+    +render_js: str?
+    +out_pdf: str?
+    +html: str?
+    +node_bin: str?
+  }
+
+  class ExtractorConfig <<module>> {
+    +min_width_px: int
+    +min_height_px: int
+    +max_images: int
+  }
+
+  class io_utils <<module>> {
+    +make_default_out_root(): str
+    +ensure_dir(p: str)
+    +write_json(p: str, data: dict)
+    +read_json(p: str): dict
+    +find_newest_dir(base: str): str
+    +try_remove(p: str)
+  }
+
+  class node_render <<module>> {
+    +render_pdf_with_node(render_js: str, temp_dir: str, out_pdf: str, html: str?, node_bin: str="node"): None
+  }
+
+  class Orchestrator <<module>> {
+    +run(json_dir: str, pdf_path: str, out_root: str|None): OrchestratorSummary
+    +run_with_render(...): OrchestratorSummary
+  }
+
+  class OrchestratorSummary <<module>> {
+    +temp_dir: str
+    +report_metadata_path: str
+    +analysis_json_path: str
+    +merged_json_path: str
+    +rendered_pdf_path: str?
+  }
+}
+
+namespace tricho_pipeline.extraction {
+  class PdfExtractor <<module>> {
+    +extract_pdf_assets(pdf_path: str, out_root: str): dict
+  }
+}
+
+namespace tricho_pipeline.analysis {
+  class TrichoAnalyzer <<module>> {
+    +analyze(json_data: dict): dict
+  }
+}
+
+namespace tricho_pipeline.cli {
+  class main <<module>> {
+    +main(): int
+  }
+}
+
+' ==============================
+' External / Runtime deps
+' ==============================
+package "External (Python)" as ext_py {
+  class numpy <<external>>
+  class pandas <<external>>
+  class pillow <<external>>
+  class pymupdf4llm <<external>>
+  class subprocess <<stdlib>>
+  class json <<stdlib>>
+  class pathlib <<stdlib>>
+  class os <<stdlib>>
+}
+
+package "External (Node.js)" as ext_node {
+  class "render.js" as render_js <<external>>
+  note right of render_js
+    Node-side renderer (Puppeteer/Chromium)
+    Receives: temp_dir, html path, out_pdf
+  end note
+}
+
+' ==============================
+' Dependencies (arrows = uses)
+' ==============================
+
+' CLI
+tricho_pipeline.cli.main --> tricho_pipeline.core.Orchestrator : uses
+tricho_pipeline.cli.main --> tricho_pipeline.core.PipelineConfig : builds
+
+' Orchestrator
+tricho_pipeline.core.Orchestrator --> tricho_pipeline.extraction.PdfExtractor : uses
+tricho_pipeline.core.Orchestrator --> tricho_pipeline.analysis.TrichoAnalyzer : uses
+tricho_pipeline.core.Orchestrator --> tricho_pipeline.core.PipelineConfig : has
+tricho_pipeline.core.Orchestrator --> tricho_pipeline.core.io_utils : calls
+tricho_pipeline.core.Orchestrator --> tricho_pipeline.core.node_render : (optional) calls for PDF
+tricho_pipeline.core.node_render --> subprocess
+tricho_pipeline.core.node_render ..> render_js : invokes (node)
+
+' Extractor
+tricho_pipeline.extraction.PdfExtractor --> tricho_pipeline.core.ExtractorConfig : has
+tricho_pipeline.extraction.PdfExtractor --> tricho_pipeline.core.io_utils : writes files
+tricho_pipeline.extraction.PdfExtractor --> pillow : image ops
+tricho_pipeline.extraction.PdfExtractor --> pymupdf4llm : PDF parse/extract
+
+' Analyzer
+tricho_pipeline.analysis.TrichoAnalyzer --> numpy
+tricho_pipeline.analysis.TrichoAnalyzer --> pandas
+
+' Utils
+tricho_pipeline.core.io_utils --> json
+tricho_pipeline.core.io_utils --> pathlib
+tricho_pipeline.core.io_utils --> os
+
+' ==============================
+' Notes
+' ==============================
+note top of tricho_pipeline.core.Orchestrator
+  Orchestrates:
+    1) PDF asset extraction (images/meta)
+    2) JSON analysis/aggregation
+    3) Merge report_metadata + analysis => tricho_data.json
+    4) (Optional) Call Node renderer to make final PDF
+end note
+
+legend right
+  == Stereotypes ==
+  <<module>>  : Internal Python module
+  <<external>>: 3rd-party dependency
+  <<stdlib>>  : Python Standard Library
+end legend
+
+@enduml

@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Node.js LTS を導入（NodeSource）
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
-    && apt-get update && apt-get install -y --no-install-recommends nodejs \
+    && apt-get update && apt-get install -y --no-install-recommends nodejs && apt-get install tree -y \
     && rm -rf /var/lib/apt/lists/*
 
 # PuppeteerがChromiumを再ダウンロードしないように設定

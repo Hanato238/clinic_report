@@ -1,0 +1,80 @@
+@startuml
+title tricho-pipeline – Dependencies (Simple)
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment center
+skinparam ArrowColor #555
+skinparam ArrowThickness 1
+skinparam ClassFontSize 14
+hide methods
+hide stereotypes
+
+' =======================
+' Internal modules
+' =======================
+package "tricho_pipeline.core" as Core {
+  class PipelineConfig
+  class ExtractorConfig
+  class io_utils
+  class node_render
+  class Orchestrator
+}
+
+package "tricho_pipeline.extraction" as Extraction {
+  class PdfExtractor
+}
+
+package "tricho_pipeline.analysis" as Analysis {
+  class TrichoAnalyzer
+}
+
+package "tricho_pipeline.cli" as CLI {
+  class main
+}
+
+' =======================
+' External deps (grouped)
+' =======================
+package "External (Python)" as ExtPy {
+  class numpy
+  class pandas
+  class Pillow
+  class pymupdf4llm
+  class subprocess
+}
+
+package "External (Node)" as ExtNode {
+  class "render.js"
+}
+
+' =======================
+' Dependency edges (uses)
+' =======================
+
+' CLI
+CLI.main --> Core.Orchestrator
+CLI.main --> Core.PipelineConfig
+
+' Orchestrator
+Core.Orchestrator --> Extraction.PdfExtractor
+Core.Orchestrator --> Analysis.TrichoAnalyzer
+Core.Orchestrator --> Core.PipelineConfig
+Core.Orchestrator --> Core.io_utils
+Core.Orchestrator --> Core.node_render
+
+' node_render
+Core.node_render --> ExtPy.subprocess
+Core.node_render ..> ExtNode.render.js : invokes (node)
+
+' Extractor
+Extraction.PdfExtractor --> Core.ExtractorConfig
+Extraction.PdfExtractor --> Core.io_utils
+Extraction.PdfExtractor --> ExtPy.Pillow
+Extraction.PdfExtractor --> ExtPy.pymupdf4llm
+
+' Analyzer
+Analysis.TrichoAnalyzer --> ExtPy.numpy
+Analysis.TrichoAnalyzer --> ExtPy.pandas
+
+@enduml

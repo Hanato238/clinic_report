@@ -32,7 +32,8 @@
         "ritwickdey.liveserver",
         "shd101wyy.markdown-preview-enhanced",
         "visualstudioexptteam.intellicode-api-usage-examples",
-        "visualstudioexptteam.vscodeintellicode"
+        "visualstudioexptteam.vscodeintellicode",
+        "benkosoftware.plantumlviewer"
       ]
     }
   },

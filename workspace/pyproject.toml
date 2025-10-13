@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tricho-pipeline"
+version = "0.1.0"
+description = "Hybrid Python+Node pipeline for Hair/Tricho reports"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "You"}]
+
+dependencies = [
+  "numpy>=1.23",
+  "pandas>=1.5",
+  "Pillow>=10.0",
+  "pymupdf4llm>=0.0.9",
+]
+
+[project.urls]
+Homepage = "https://example.com"
+
+[project.scripts]
+tricho-pipeline = "tricho_pipeline.cli.main:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
